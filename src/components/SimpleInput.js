@@ -3,6 +3,7 @@ import useInput from '../customHooks/useInput'
 
 const SimpleInput = (props) => {
 
+  console.log()
   const emailValidation = (value) => { 
     return value.includes('@') && value.trim() !== ''
   }

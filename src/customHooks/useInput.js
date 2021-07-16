@@ -1,34 +1,73 @@
-import React, { useState } from 'react'
+import {  useReducer } from 'react'
+
+const defaultState = { 
+    enteredValue: "", 
+    touched: false, 
+    valueIsValid: false,
+    hasError: false
+}
+
+const inputReducer = (state, action) => {
+    switch (action.type) {
+        case "VALUE_CHANGED":
+            
+            return {
+                ...state, 
+                enteredValue: action.payload
+            }
+        
+        case "INPUT_BLUR":
+            return {
+                ...state, 
+                touched: true
+            }
+        case "RESET":
+            return {
+                ...state, 
+                enteredValue: "",
+                touched: false
+            }
+
+        default:
+           return defaultState
+    }
+}
 
 const useInput = (validateValue) => {
 
-    const [enteredValue, setEnteredValue] = useState("")
-    const [touched, setTouched] = useState(false)
-   
+ 
+    const [state, dispatch] = useReducer(inputReducer, defaultState)
+ 
 
-    const valueIsValid = validateValue(enteredValue)
-    const hasError = !valueIsValid && touched
+     state.valueIsValid = validateValue(state.enteredValue)
+     state.hasError = !state.valueIsValid && state.touched
 
     const valueChangedHandler = (event) => {
-        setEnteredValue(event.target.value)
+        dispatch({ 
+            type: "VALUE_CHANGED", 
+            payload: event.target.value
+        })
     }
 
     const InputBlurHandler = (event) => {
-        setTouched(true)
+        dispatch({ 
+            type: "INPUT_BLUR", 
+        })
     }
 
     const reset = () => { 
-        setEnteredValue("")
-        setTouched(false)
+        dispatch({ 
+            type: "RESET", 
+        })
     }
       
     return {
-        value: enteredValue,
-        hasError,
+        value: state.enteredValue,
+        hasError: state.hasError,
         valueChangedHandler,
         InputBlurHandler, 
         reset, 
-        isValid: valueIsValid,
+        isValid: state.valueIsValid,
        
     }
 }
